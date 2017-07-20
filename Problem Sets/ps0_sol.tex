@@ -1,0 +1,229 @@
+\documentclass[11pt,a4paper,titlepage]{article}
+\usepackage[a4paper]{geometry}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{lipsum}
+
+\usepackage{amsmath, amssymb, amsfonts, amsthm, mathtools, physics}
+% mathtools for: Aboxed (put box on last equation in align envirenment)
+\usepackage{microtype} %improves the spacing between words and letters
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%    SECTIONS
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\usepackage{titlesec}
+\usepackage{sectsty}
+%%%%%%%%%%%%%%%%%%%%%%%%
+%set section enumerator to arabic number (see footnotes markings alternatives)
+\renewcommand\thesection{\arabic{section}} %define sections numbering
+\renewcommand\thesubsection{\thesection\alph{subsection}} %numberletter
+
+%define new section style
+\newcommand{\mysection}{
+\titleformat{\section} [runin] {\usefont{OT1}{lmss}{b}{n}} 
+{\thesection} {3pt} {} } 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%		Shortcuts
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\R}{\mathbb{R}}
+
+
+
+\makeatletter
+\let\reftagform@=\tagform@
+\def\tagform@#1{\maketag@@@{(\ignorespaces\textcolor{red}{#1}\unskip\@@italiccorr)}}
+\renewcommand{\eqref}[1]{\textup{\reftagform@{\ref{#1}}}}
+\makeatother
+\usepackage{hyperref}
+\hypersetup{colorlinks=true}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% PREPARE TITLE
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title{CS 229: Machine Learning\\
+Problem Set $0$}
+\author{William Ma}
+\date{\today}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+
+\begin{document}
+\maketitle
+
+\section{Question 1}{
+\subsection{Part a}{%
+Given $f(x)=\frac{1}{2}x^{T}Ax+b^{T}x$ where A is a symmetric matrix and and $b \in \R^{n}$ is a vector, we can calculate $\nabla_x f(x)$ by taking the partial derivative
+\begin{align*}
+\pdv{f(x)}{x_k} &= \pdv{}{x_k}\Big[\frac{1}{2}\sum_{i=1}^{n}\sum_{j=1}^{n}\ x_iA_{ij}x_j + \sum_{i=1}^{n}\ b_ix_i\Big]\\
+&=\pdv{}{x_k}\frac{1}{2}\Big[\sum_{i\ne k}\sum_{j\ne k}A_{ij}x_{i}x_{j} + \sum_{i \ne k} A_{ik}x_{i}x_{k} + \sum_{j \ne k}A_{kj}x_{k}x_{j} + A_{kk} x_{k}\Big]\\
+&\hphantom{=}+ \pdv{}{x_k} \sum_{i=1}^n\ b_{i}x_{i}\\
+&=\frac{1}{2}\sum_{i \ne k} A_{ik}x_{i} + \frac{1}{2}\sum_{j \ne k} A_{kj}x_{j}+A_{kk}x_{k}^2 + b_{k}\\
+&=\frac{1}{2}\sum_{i=1}^{n} A_{ik}x_{i} + \frac{1}{2}\sum_{j=1}^{n} A_{kj}x_{j} + b_k\\
+&=\sum_{i=1}^{n} A_{ik}x_{i} + b_k
+\end{align*}
+Now we can easily see that, if $\nabla_{x}f(x)=2Ax+b$
+}\label{prob:1a}
+%%% END SUBSECTION 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Part b}{
+Given that $f(x)=g(h(x))$, where $g:\R\to\R$ is differentiable and $h:\R^{n}\to\R$ is differentiable, we can expand $f(x)$ to arrive at the solution
+\begin{align*}
+\pdv{f(x)}{x_k} &= \pdv{}{x_k} g(h(x))
+\end{align*}
+By invoking Chain Rule,
+\begin{align*}
+\pdv{f(x)}{x_k} &= g'(h(x))\pdv{}{x_k}h(x)
+\end{align*}
+Combining these back into a vector,
+\begin{align*}
+\nabla f(x) = \begin{bmatrix} 
+				g'(h(x))\pdv{}{x_1}h(x)
+                \\ \vdots
+                \\g'(h(x))\pdv{}{x_n}h(x)
+               \end{bmatrix}
+= g'(h(x))\nabla h(x)
+\end{align*}
+}\label{prob:1b}
+%%% END SUBSECTION 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Part c}{
+Given $f(x)=\frac{1}{2}x^{T}Ax+b^{T}x$ where A is a symmetric matrix and and $b \in \R^{n}$ is a vector, we can calculate the Hessian as follows
+\begin{align*}
+\pdv[2]{f(x)}{x_k} &= \pdv[2]{}{x_k}\Big[\frac{1}{2}\sum_{i=1}^{n}\sum_{j=1}^{n}\ x_iA_{ij}x_j + \sum_{i=1}^{n}\ b_ix_i\Big]\\
+&=\pdv[2]{}{x_k}\frac{1}{2}\Big[\sum_{i\ne k}\sum_{j\ne k}A_{ij}x_{i}x_{j} + \sum_{i \ne k} A_{ik}x_{i}x_{k} + \sum_{j \ne k}A_{kj}x_{k}x_{j} + A_{kk} x_{k}^{2}\Big]\\
+&\hphantom{=}+ \pdv[2]{}{x_k} \sum_{i=1}^n\ b_{i}x_{i}\\
+&=\frac{1}{2}\sum_{i \ne k} A_{ik} + \frac{1}{2}\sum_{j \ne k} A_{kj}+2A_{kk}x_{k}\\
+&=\frac{1}{2}\sum_{i=1}^{n} A_{ik} + \frac{1}{2}\sum_{j=1}^{n} A_{kj}\\
+&=\sum_{i=1}^{n} A_{ik}
+\end{align*}
+Thus, the $\nabla^2 f(x) = A$.
+}\label{prob:1c}
+%%% END SUBSECTION 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Part d}{
+Given $f(x)=g(a^Tx)$, where $g:\R\to\R$ is continuously differentiable and $a\in\R^n$ is a vector, we can calculate $\nabla f(x)$ using the result we got from problem \ref{prob:1a} and \ref{prob:1b}
+\begin{align*}
+\nabla f(x) &= g'(a^Tx)\ \nabla(a^Tx)
+\\&= g'(a^Tx)a
+\end{align*}
+However, for the Hessian, we have to expand, apply Chain rule to each term, then recombine back into a vector.
+\begin{align*}
+\pdv{f(x)}{x_i}{x_j} &= \pdv{}{x_k}{x_i}{x_j} g(a^Tx)
+\\&= g''(a^Tx)\pdv{}{x_i}\ \sum_{k=1}^{n} a_kx_k\ \pdv{}{x_j}\sum_{l=1}^{n} a_lx_l
+\\&= g''(a^Tx)a_ia_j
+=\begin{bmatrix}
+		g''(a^Tx)a_1a_1 & \dots  & g''(a^Tx)a_1a_n	\\
+        \vdots 			& \ddots & \vdots			\\
+        g''(a^Tx)a_na_1 & \dots  & g''(a^Tx)a_na_n
+	\end{bmatrix}
+\\&=g''(a^Tx)aa^T
+\end{align*}
+Thus, $\nabla^2f(x)=g''(a^Tx)aa^T$.
+}\label{prob:1d}
+%%% END SUBSECTION 4 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+}\label{problem 1}
+%%% END SECTION 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Problem 2}{
+\subsection{Part a}{
+\begin{proof}
+Given $z\in\R^n$ and that $A=zz^T$, $A\in\mathbb{S}^{n \times n}_+$ if $A=A^T$ and $x^TAx\geq0$.
+\begin{align*}
+A &= A^T
+\\zz^T &= (zz^T)^T
+\\zz^T &= (z^T)^Tz^T = zz^t
+\end{align*}
+Thus, $A = A^T$.
+\begin{align*}
+x^TAx&\geq0
+\\x^Tzz^Tx&\geq0
+\\(x^Tz)(x^Tz)^T&\geq0
+\\(x^Tz)^2&\geq0
+\end{align*}
+Thus, since $A=A^T$ and $x^TAx\geq0$, $A\in\mathbb{S}^{n \times n}_+$.
+\end{proof}
+}\label{prob:2a}
+%%% END SUBSECTION 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Part b}{
+Given $z\in\R^n$ is a $\textit{non-zero}$ vector and $A=zz^t$, the null-space of A is 1 since, $Ax=0$ only when $x$ is orthogonal to $z$, which implies that $z^Tx=0$ as shown.
+\begin{align*}
+	Ax&=0
+  \\zz^Tx&=0
+  \\z(0)&=0
+\end{align*}
+Thus, the null-space is 1. Using the rank-nullity theorem, the rank of A is $n-1$.
+}\label{prob:2b}
+%%% END SUBSECTION 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Part c}{
+\begin{proof}
+Given $A\in\mathbb{S}^{n \times n}_+$ and $B\in\R^{m\times n}$ is arbitary, 
+\begin{align*}
+	BAB^T &= (BAB^T)^T
+  \\BAB^T &= (B^T)^TA^TB^T
+  \\BAB^T &= BAB^T
+\end{align*}
+Thus, $BAB^T = (BAB^T)^T$.
+\begin{align*}
+	x^TBAB^Tx&\geq0
+  \\(x^TB)A(x^TB)^T&\geq0
+\end{align*}
+Since $A\in\mathbb{S}^{n \times n}_+$, then $yAy^T\geq0$. We can simply let $y=x^TB$ for $(x^TB)A(x^TB)^T\geq0$ to be true. Thus, since $BAB^T = (BAB^T)^T$ and $x^TBAB^Tx\geq0$, $BAB^T\in\mathbb{S}^{m \times m}_+$.
+\end{proof}
+}\label{prob:2c}
+%%% END SUBSECTION 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+}\label{problem 2}
+%%% END SECTION 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\section{Problem 3}{
+\subsection{part a}{
+\begin{proof}
+Given that $A$ is diagonalizable, such that $A=T\Lambda T^{-1}$, and $t^{(i)}\in\R^n$ is the $i$-th column of $T$,
+\begin{align*}
+	At^{(i)}&=T\Lambda T^{-1}t^{(i)}
+\end{align*}
+The inverse of a matrix, $M\in\R^{n \times n}$ multiplied by $x^{(i)}$, the $i$-th column of $M$, returns always returns a $n\times n$ matrix, $N$, where
+\begin{align*}
+	N_{jk} = 
+    \begin{cases}
+    	1, & \text{if } j=i \text{ and } k=i\\
+        0, & \text{otherwise}
+    \end{cases}
+\end{align*}
+Thus, 
+\begin{align*}
+	At^{(i)}&=T\Lambda T^{-1}t^{(i)}=T\lambda_{(i)}
+	\\&=t^{(i)}\lambda_i=\lambda_it^{(i)}
+\end{align*}
+Thus, $At^{(i)}=\lambda_it^{(i)}$ where $(t^{(i)}, \lambda_i)$ are the eigenvector/eigenvalue pair of $A$. 
+\end{proof}
+}\label{prob:3a}
+%%% END SUBSECTION 1 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Part b}{
+\begin{proof}
+Given that $A$ is symmetric, $A=U\Lambda U^{-1}$, $U$ is orthogonal, and $u^{(i)}\in\R^n$ is the $i$-th column of $T$,
+\begin{align*}
+	Au^{(i)}&=U\Lambda U^Tu^{(i)}
+    \\&=U\Lambda U^{(-1)}u^{(i)}
+\end{align*}
+We can use the result we got from problem \ref{prob:3a} and get that $Au^{(i)}=\lambda_iu^{(i)}$, where $(u^{(i)}, \lambda_i)$ are the eigenvector/eigenvalue pair of $A$.
+\end{proof}
+}\label{prob:3b}
+%%% END SUBSECTION 2 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Part c}{
+\begin{proof}
+Given $A\in\mathbb{S}^{n \times n}_+$ and $\lambda_i$ is an eigenvalue of A,
+\begin{align*}
+	x^TAx&\geq0
+  \\x^TU\Lambda U^Tx&\geq0
+  \\(x^TU)\Lambda (x^TU)^T&\geq0
+\end{align*}
+Since $\Lambda$ is a diagonal matrix, $\Lambda\in\mathbb{S}^{n \times n}_+$, which implies that $\lambda_i\geq0$. 
+\end{proof}
+}\label{prob:3c}
+%%% END SUBSECTION 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+}\label{problem 3}
+%%% END SECTION 3 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}
